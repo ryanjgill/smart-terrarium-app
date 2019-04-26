@@ -1,0 +1,22 @@
+# Smart Terrarium
+App for connecting to Smart Terrarium client as well as hardware:
+- Raspberry Pi 3 Model A+
+  - Express Web Server
+    - Johnny-Five
+    - RethinkDB
+    - WebSockets
+  - Smart Terrarium Client
+    - Vue.js
+    - ApexCharts.js
+    - WebSockets
+- Arduino MKR1000
+  - (5) DS18B20 Dallas Temperature Probes using OneWire
+    - Monitor cage temperatures at different locations
+- Arduino Uno
+  - (2) HC-SR04 Proximity Sensors 
+    - Monitor water levels for misting system and drain
+  - UV Index Sensor
+  - Humidity Sensor
+  - Soil Moisture sensor
+  - Relay for Misting System
+  - Relay for Lighting System
