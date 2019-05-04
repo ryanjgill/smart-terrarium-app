@@ -30,6 +30,9 @@ DeviceAddress Probe03 = {0x28, 0xFF, 0x27, 0x1E, 0xB1, 0x16, 0x04, 0xFC};
 DeviceAddress Probe04 = {0x28, 0xFF, 0x6A, 0x74, 0xB0, 0x16, 0x05, 0x87};
 DeviceAddress Probe05 = {0x28, 0xFF, 0x0E, 0xB5, 0xB0, 0x16, 0x03, 0xE2};
 
+int uvSensor = A1;
+int uvIndex = 0;
+
 char serverAddress[] = "192.168.86.132"; // server address
 int port = 3030;
 
@@ -110,11 +113,17 @@ void loop() /****** LOOP: RUNS CONSTANTLY ******/
   printTemperature(Probe05);
   Serial.println();
 
+  Serial.print("uvIndex:  ");
+  Serial.print(uvIndex);
+  Serial.println();
+
   float probeA = sensors.getTempC(Probe01);
   float probeB = sensors.getTempC(Probe02);
   float probeC = sensors.getTempC(Probe03);
   float probeD = sensors.getTempC(Probe04);
   float probeE = sensors.getTempC(Probe05);
+  float uvSensorValue = analogRead(uvSensor);
+  uvIndex = uvSensorValue / 1024 * 3.3 / 0.1;
 
   String postURL = String("POST readings to " + String(serverAddress) + ':' + String(port));
   Serial.println(postURL);
@@ -125,7 +134,8 @@ void loop() /****** LOOP: RUNS CONSTANTLY ******/
       "&probeC=" + String(probeC) +
       "&probeD=" + String(probeD) +
       "&probeE=" + String(probeE) +
-      "&rig_name=" + String(RIG_NAME));
+      "&rig_name=" + String(RIG_NAME) +
+      "&uvIndex=" + String(uvIndex));
 
   digitalWrite(LED_BUILTIN, HIGH);
   client.post("/temperatures", contentType, postData);
@@ -148,7 +158,7 @@ void loop() /****** LOOP: RUNS CONSTANTLY ******/
   digitalWrite(LED_BUILTIN, HIGH);
   delay(100);
   digitalWrite(LED_BUILTIN, LOW);
-  delay(600);
+  delay(1000);
 }
 
 // print temperature for device adress
@@ -159,7 +169,7 @@ void printTemperature(DeviceAddress deviceAddress)
 
   if (tempC == -127.00)
   {
-    Serial.print("Error getting temperature.");
+    Serial.print("Error getting temperature  ");
   }
   else
   {

@@ -9,7 +9,7 @@ const path = require('path')
 const bodyParser = require('body-parser')
 const five = require("johnny-five");
 const ports = [
-  { id: "A", port: "/dev/cu.usbmodem149201", repl: false }
+  //{ id: "A", port: "/dev/cu.usbmodem14601", repl: false }
   //{ id: "B", port: "usbmodem149101", repl: false }
 ];
 
@@ -63,7 +63,8 @@ app.post('/temperatures', (req, res, next) => {
     probeC: body.probeC,
     probeD: body.probeD,
     probeE: body.probeE,
-    rig_name: body.rig_name
+    rig_name: body.rig_name,
+    uvIndex: body.uvIndex
   }
 
   lastReading = reading
