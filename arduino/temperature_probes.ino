@@ -2,6 +2,7 @@
 #include <DallasTemperature.h>
 #include <ArduinoHttpClient.h>
 #include <WiFi101.h>
+#include <SimpleDHT.h>
 // Using Pin 5 of MKR1000
 #define ONE_WIRE_BUS_PIN 5
 // TODO: Move out ot separate file
@@ -32,6 +33,9 @@ DeviceAddress Probe05 = {0x28, 0xFF, 0x0E, 0xB5, 0xB0, 0x16, 0x03, 0xE2};
 
 int uvSensor = A1;
 int uvIndex = 0;
+
+int pinDHT22 = A2;
+SimpleDHT22 dht22(pinDHT22);
 
 char serverAddress[] = "192.168.86.132"; // server address
 int port = 3030;
@@ -125,6 +129,23 @@ void loop() /****** LOOP: RUNS CONSTANTLY ******/
   float uvSensorValue = analogRead(uvSensor);
   uvIndex = uvSensorValue / 1024 * 3.3 / 0.1;
 
+  byte temperature = 0;
+  byte humidity = 0;
+  int err = SimpleDHTErrSuccess;
+  if ((err = dht22.read(&temperature, &humidity, NULL)) != SimpleDHTErrSuccess)
+  {
+    Serial.print("Read DHT22 failed, err=");
+    Serial.println(err);
+  }
+  else
+  {
+    Serial.print("DHT22: ");
+    Serial.print((int)temperature);
+    Serial.print(" *C, ");
+    Serial.print((int)humidity);
+    Serial.println(" RH%");
+  }
+
   String postURL = String("POST readings to " + String(serverAddress) + ':' + String(port));
   Serial.println(postURL);
   String contentType = "application/x-www-form-urlencoded";
@@ -135,7 +156,9 @@ void loop() /****** LOOP: RUNS CONSTANTLY ******/
       "&probeD=" + String(probeD) +
       "&probeE=" + String(probeE) +
       "&rig_name=" + String(RIG_NAME) +
-      "&uvIndex=" + String(uvIndex));
+      "&uvIndex=" + String(uvIndex) +
+      "&humidity=" + String(humidity) +
+      "&temperature=" + String(temperature));
 
   digitalWrite(LED_BUILTIN, HIGH);
   client.post("/temperatures", contentType, postData);
