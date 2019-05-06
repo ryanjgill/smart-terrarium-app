@@ -1,49 +1,42 @@
 const express = require('express')
 const app = express()
-const server = require('http').createServer(app);
-const io = require('socket.io')(server);
+const server = require('http').createServer(app)
+const io = require('socket.io')(server)
 const ip = require('ip')
-const PORT = 3030;
+const PORT = 3030
 const serverIP = `${ip.address()}:${PORT}`
 const path = require('path')
 const bodyParser = require('body-parser')
-const five = require("johnny-five");
-const ports = [
-  //{ id: "A", port: "/dev/cu.usbmodem14601", repl: false }
-  //{ id: "B", port: "usbmodem149101", repl: false }
-];
+const five = require("johnny-five")
+const saveMeasurement = require('./database/saveMeasurement')
 
-var misterWaterLevel, drainWaterLevel, lastReading;
+var misterWaterLevel = 0,
+  drainWaterLevel = 0,
+  lastReading
     
-new five.Boards(ports).on("ready", function() {
-  // |this| is an array-like object containing references
-  // to each initialized board.
-  this.each(function(board) {
+new five.Board({ port: "/dev/cu.usbmodem14601", repl: false }).on("ready", function() {
+  console.log('Johnny-Five up, Board Ready!')
 
-    // Initialize an Led instance on pin 13 of
-    // each initialized board and strobe it.
-    // new five.Led({ pin: 13, board }).strobe();
+  // Initialize water level sensors using proximity sensors
+  let misterWaterLevelSensor = new five.Proximity({ controller: "HCSR04", pin: "A0" })
+  let drainWaterLevelSensor = new five.Proximity({ controller: "HCSR04", pin: "A1" })
 
-    // Initialize water level sensors using proximity sensors
-    let misterWaterLevelSensor = new five.Proximity({ pin: 2, board, freq: 100 })
-    let drainWaterLevelSensor = new five.Proximity({ pin: 3, board, freq: 100 })
+  misterWaterLevelSensor.on('change', function() {
+    misterWaterLevel = this.cm
+  })
 
-    misterWaterLevelSensor.on('data', function(val) {
-      misterWaterLevel = this.cm;
-    });
+  drainWaterLevelSensor.on('change', function() {
+    drainWaterLevel = this.cm
+  })
 
-    drainWaterLevelSensor.on('data', function(val) {
-      drainWaterLevel = this.cm;
-    });
+  // setInterval(function () { 
+  //   console.log(`${drainWaterLevel}cm : ${misterWaterLevel}cm`)
+  // }, 1000)
+})
 
-    // setInterval(function () { 
-    //   console.log(`${drainWaterLevel}cm : ${misterWaterLevel}cm`)
-    // }, 1000)
-  });
-});
 app.use(bodyParser.urlencoded({
   extended: true
-}));
+}))
 app.use(express.static(path.join(__dirname, 'public')))
 app.set('views', path.join(__dirname, 'views'))
 
@@ -64,34 +57,29 @@ app.post('/temperatures', (req, res, next) => {
     probeD: body.probeD,
     probeE: body.probeE,
     rig_name: body.rig_name,
-    uvIndex: body.uvIndex
+    uvIndex: body.uvIndex,
+    humidity: body.humidity,
+    temperature: body.temperature,
+    misterWaterLevel,
+    drainWaterLevel
   }
 
   lastReading = reading
 
-  console.log(lastReading);
-  res.sendStatus(200)
-  next()
-
+  console.log(lastReading)
   //io.sockets.emit('reading', reading)
-
-  // if (new Date().getTime() - lastSaveTime > SAVE_DELAY) {
-  //   r.table('temperatures').insert(reading).run()
-  //     .then(function(result) {
-  //       lastSaveTime = new Date().getTime()
-  //       res.sendStatus(200)
-  //       console.log('Reading saved.')
-  //       next()
-  //     })
-  //     .catch(err => {
-  //       console.log(err)
-  //       res.sendStatus(500)
-  //       next()
-  //     });
-  // } else {
-  //   res.sendStatus(200)
-  //   next()
-  // }
+  saveMeasurement(lastReading)
+    .then(results => {
+      lastSaveTime = new Date().getTime()
+      res.sendStatus(200)
+      console.log('Reading saved.')
+      next()
+    })
+    .catch(error => {
+      console.log(error)
+      res.sendStatus(500)
+      next()
+    })
 })
 
 server.listen(PORT, () => console.log(`API listening on ${serverIP}`))
