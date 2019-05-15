@@ -11,6 +11,7 @@ const bodyParser = require('body-parser')
 const five = require("johnny-five")
 const saveMeasurement = require('./database/saveMeasurement')
 const getAllMeasurements = require('./database/getAllMeasurements')
+const getSparklines = require('./database/getSparklines')
 var misterWaterLevel = 0,
   drainWaterLevel = 0,
   lastReading
@@ -58,6 +59,22 @@ app.get('/measurements', (req, res, next) => {
       return measurements;
     }, [])
     res.json(temp)
+    next()
+  })
+  .catch(err => {
+    console.log(err)
+    next()
+  })
+})
+
+app.get('/sparklines', (req, res, next) => {
+  getSparklines()
+  .then(results => {
+    let temp = results.reduce((measurements, m, index) => {
+      if (index % 10 === 0) { measurements.push(m) }
+      return measurements;
+    }, [])
+    res.json(temp.reverse())
     next()
   })
   .catch(err => {
