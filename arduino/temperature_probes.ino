@@ -37,6 +37,9 @@ int uvIndex = 0;
 int pinDHT22 = A2;
 SimpleDHT22 dht22(pinDHT22);
 
+int soilSensor = A3;
+int soilMoisture = 0;
+
 char serverAddress[] = "192.168.86.132"; // server address
 int port = 3030;
 
@@ -94,6 +97,19 @@ void loop() /****** LOOP: RUNS CONSTANTLY ******/
 
   // Command all devices on bus to read temperature
   sensors.requestTemperatures();
+
+  float probeA = sensors.getTempC(Probe01);
+  float probeB = sensors.getTempC(Probe02);
+  float probeC = sensors.getTempC(Probe03);
+  float probeD = sensors.getTempC(Probe04);
+  float probeE = sensors.getTempC(Probe05);
+
+  float moistureSensorValue = analogRead(soilSensor);
+  soilMoisture = ((moistureSensorValue / 1024) - 1) * 100 * -1;
+
+  float uvSensorValue = analogRead(uvSensor);
+  uvIndex = uvSensorValue / 1024 * 3.3 / 0.1;
+
   Serial.print("Rig Name: ");
   Serial.println(String(RIG_NAME));
 
@@ -117,17 +133,13 @@ void loop() /****** LOOP: RUNS CONSTANTLY ******/
   printTemperature(Probe05);
   Serial.println();
 
+  Serial.print("soilMoisture:  ");
+  Serial.print(soilMoisture);
+  Serial.println();
+
   Serial.print("uvIndex:  ");
   Serial.print(uvIndex);
   Serial.println();
-
-  float probeA = sensors.getTempC(Probe01);
-  float probeB = sensors.getTempC(Probe02);
-  float probeC = sensors.getTempC(Probe03);
-  float probeD = sensors.getTempC(Probe04);
-  float probeE = sensors.getTempC(Probe05);
-  float uvSensorValue = analogRead(uvSensor);
-  uvIndex = uvSensorValue / 1024 * 3.3 / 0.1;
 
   byte temperature = 0;
   byte humidity = 0;
@@ -157,6 +169,7 @@ void loop() /****** LOOP: RUNS CONSTANTLY ******/
       "&probeE=" + String(probeE) +
       "&rig_name=" + String(RIG_NAME) +
       "&uvIndex=" + String(uvIndex) +
+      "&soilMoisture=" + String(soilMoisture) +
       "&humidity=" + String(humidity) +
       "&temperature=" + String(temperature));
 
