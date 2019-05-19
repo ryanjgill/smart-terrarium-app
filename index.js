@@ -96,6 +96,7 @@ app.post('/temperatures', (req, res, next) => {
     rig_name: body.rig_name,
     uvIndex: body.uvIndex,
     humidity: body.humidity,
+    soilMoisture: body.soilMoisture,
     temperature: body.temperature,
     misterWaterLevel,
     drainWaterLevel
