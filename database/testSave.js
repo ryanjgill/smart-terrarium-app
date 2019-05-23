@@ -1,4 +1,4 @@
-const config = require('./../config')
+const config = require('./../config.json')
 const database = 'SmartTerrarium'
 const r = require('rethinkdbdash')({
   db: database,

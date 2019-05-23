@@ -1,4 +1,4 @@
-const config = require('./../config')
+const config = require('./../config.json')
 const database = 'test3'
 var r = require('rethinkdbdash')({
   db: database,
