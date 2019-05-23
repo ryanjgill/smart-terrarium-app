@@ -3,7 +3,7 @@ const database = 'SmartTerrarium'
 var r = require('rethinkdbdash')({
   db: database,
   servers: [{
-    host: config.databaseIp,
+    host: '192.168.86.132',
     port: 28015
   }]
 })
