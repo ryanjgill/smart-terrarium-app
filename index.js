@@ -29,12 +29,12 @@ new five.Board({ repl: false }).on("ready", function() {
   const misterRelay = new five.Relay(3)
 
   misterWaterLevelSensor.on('change', function() {
-    let level = Math.round((emptyMisterLevel - this.cm + 3) / emptyMisterLevel * 100)
+    let level = Math.round((emptyMisterLevel - this.cm + 1) / emptyMisterLevel * 100)
     misterWaterLevel = level > 0 ? level : 0
   })
 
   drainWaterLevelSensor.on('change', function() {
-    let level =  Math.round((emptyDrainLevel - this.cm + 3) / emptyDrainLevel * 100)
+    let level =  Math.round((emptyDrainLevel - this.cm + 1) / emptyDrainLevel * 100)
     drainWaterLevel = level > 0 ? level : 0
   })
 
