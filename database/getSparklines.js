@@ -1,4 +1,4 @@
-const config = require('../config')
+const config = require('./../config')
 const moment = require('moment')
 const database = 'SmartTerrarium'
 const tableName = 'measurements'
