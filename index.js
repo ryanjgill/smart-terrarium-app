@@ -10,33 +10,50 @@ const path = require('path')
 const bodyParser = require('body-parser')
 const five = require("johnny-five")
 const saveMeasurement = require('./database/saveMeasurement')
-const getAllMeasurements = require('./database/getAllMeasurements')
+const getSampleMeasurements = require('./database/getSampleMeasurements')
 const getSparklines = require('./database/getSparklines')
+const emptyMisterLevel = 26
+const emptyDrainLevel = 20
 var misterWaterLevel = 0,
   drainWaterLevel = 0,
   lastReading
     
-// new five.Board({ port: "/dev/cu.usbmodem14601", repl: false }).on("ready", function() {
-//   console.log('Johnny-Five up, Board Ready!')
+new five.Board({ repl: false }).on("ready", function() {
+  console.log('Johnny-Five up, Board Ready!')
 
-//   // Initialize water level sensors using proximity sensors
-//   let misterWaterLevelSensor = new five.Proximity({ controller: "HCSR04", pin: "A0" })
-//   let drainWaterLevelSensor = new five.Proximity({ controller: "HCSR04", pin: "A1" })
+  // Initialize water level sensors using proximity sensors
+  let misterWaterLevelSensor = new five.Proximity({ controller: "HCSR04", pin: "A0" })
+  let drainWaterLevelSensor = new five.Proximity({ controller: "HCSR04", pin: "A1" })
 
-//   misterWaterLevelSensor.on('change', function() {
-//     misterWaterLevel = this.cm
-//   })
+  const lightsRelay = new five.Relay(2)
+  const misterRelay = new five.Relay(3)
 
-//   drainWaterLevelSensor.on('change', function() {
-//     drainWaterLevel = this.cm
-//   })
+  misterWaterLevelSensor.on('change', function() {
+    let level = Math.round((emptyMisterLevel - this.cm + 3) / emptyMisterLevel * 100)
+    misterWaterLevel = level > 0 ? level : 0
+  })
 
-//   // setInterval(function () { 
-//   //   console.log(`${drainWaterLevel}cm : ${misterWaterLevel}cm`)
-//   // }, 1000)
-// })
+  drainWaterLevelSensor.on('change', function() {
+    let level =  Math.round((emptyDrainLevel - this.cm + 3) / emptyDrainLevel * 100)
+    drainWaterLevel = level > 0 ? level : 0
+  })
 
-app.use(cors());
+  io.on('connection', function(socket){
+    socket.on('toggleMister', function(value){ 
+      misterRelay = value
+    })
+
+    socket.on('toggleLights', function(value){ 
+      lightsRelay = value
+    })
+  })
+
+  setInterval(function () { 
+    console.log(`${drainWaterLevel}% : ${misterWaterLevel}%`)
+  }, 1000)
+})
+
+app.use(cors())
 
 app.use(bodyParser.urlencoded({
   extended: true
@@ -52,11 +69,11 @@ app.get('/', (req, res, next) => {
 })
 
 app.get('/measurements', (req, res, next) => {
-  getAllMeasurements()
+  getSampleMeasurements()
   .then(results => {
     let temp = results.reduce((measurements, m, index) => {
       if (index % 10 === 0) { measurements.push(m) }
-      return measurements;
+      return measurements
     }, [])
     res.json(temp)
     next()
@@ -72,9 +89,9 @@ app.get('/sparklines', (req, res, next) => {
   .then(results => {
     let temp = results.reduce((measurements, m, index) => {
       if (index % 10 === 0) { measurements.push(m) }
-      return measurements;
+      return measurements
     }, [])
-    res.json(temp.reverse())
+    res.json(temp)
     next()
   })
   .catch(err => {
@@ -104,7 +121,7 @@ app.post('/temperatures', (req, res, next) => {
 
   lastReading = reading
 
-  console.log(lastReading)
+  //console.log(lastReading)
   //io.sockets.emit('reading', reading)
   saveMeasurement(lastReading)
     .then(results => {

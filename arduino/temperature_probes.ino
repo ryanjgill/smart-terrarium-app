@@ -40,7 +40,7 @@ SimpleDHT22 dht22(pinDHT22);
 int soilSensor = A3;
 int soilMoisture = 0;
 
-char serverAddress[] = "192.168.86.132"; // server address
+char serverAddress[] = "192.168.86.127"; // raspberry pi address
 int port = 3030;
 
 WiFiClient wifi;

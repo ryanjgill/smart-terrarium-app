@@ -1,13 +1,14 @@
-const database = 'SmartTerrarium';
+const config = require('../config')
+const database = 'SmartTerrarium'
 const r = require('rethinkdbdash')({
   db: database,
   servers: [{
-    host: 'localhost',
+    host: config.databaseIp,
     port: 28015
   }]
 })
 
-const tableName = 'test';
+const tableName = 'test'
 
 const testSave = () => {
   r.table(tableName)
@@ -22,7 +23,7 @@ const testSave = () => {
       uvIndex: Math.round(Math.random() * 100 / 10)
     })
     .then(results => console.log(results))
-    .catch(error => console.log(error));
+    .catch(error => console.log(error))
 }
 
 setInterval(function () {

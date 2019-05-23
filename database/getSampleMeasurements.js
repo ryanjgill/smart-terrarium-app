@@ -9,8 +9,9 @@ const r = require('rethinkdbdash')({
   }]
 })
 
-module.exports = function getAllMeasurements() {
-  return r.table(tableName).orderBy({index: 'date'})
+module.exports = function getSampleMeasurements(sampleSize) {
+  const count = sampleSize ? sampleSize : 3000
+  return r.table(tableName).sample(count).orderBy('date')
 }
 
 /* Other Queries */

@@ -1,14 +1,14 @@
-
-const database = 'SmartTerrarium';
-const tableName = 'measurements';
+const config = require('../config')
+const database = 'SmartTerrarium'
+const tableName = 'measurements'
 const r = require('rethinkdbdash')({
   db: database,
   servers: [{
-    host: 'localhost',
+    host: config.databaseIp,
     port: 28015
   }]
-});
+})
 
 module.exports = function saveMeasurement(measurement) {
-  return r.table(tableName).insert(measurement);
+  return r.table(tableName).insert(measurement)
 }
