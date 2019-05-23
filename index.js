@@ -12,8 +12,8 @@ const five = require("johnny-five")
 const saveMeasurement = require('./database/saveMeasurement')
 const getSampleMeasurements = require('./database/getSampleMeasurements')
 const getSparklines = require('./database/getSparklines')
-const emptyMisterLevel = 26
-const emptyDrainLevel = 20
+const emptyMisterLevel = 30
+const emptyDrainLevel = 23
 var misterWaterLevel = 0,
   drainWaterLevel = 0,
   lastReading
