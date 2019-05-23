@@ -38,19 +38,15 @@ new five.Board({ repl: false }).on("ready", function() {
     drainWaterLevel = level > 0 ? level : 0
   })
 
-  io.on('connection', function(socket){
-    socket.on('toggleMister', function(value){ 
-      misterRelay = value
-    })
+  // io.on('connection', function(socket){
+  //   socket.on('toggleMister', function(value){ 
+  //     misterRelay = value
+  //   })
 
-    socket.on('toggleLights', function(value){ 
-      lightsRelay = value
-    })
-  })
-
-  setInterval(function () { 
-    console.log(`${drainWaterLevel}% : ${misterWaterLevel}%`)
-  }, 1000)
+  //   socket.on('toggleLights', function(value){ 
+  //     lightsRelay = value
+  //   })
+  // })
 })
 
 app.use(cors())
