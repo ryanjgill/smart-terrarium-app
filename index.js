@@ -16,7 +16,8 @@ const emptyMisterLevel = 30
 const emptyDrainLevel = 23
 var misterWaterLevel = 0,
   drainWaterLevel = 0,
-  lastReading
+  lastReading,
+  lastSaveTime
     
 new five.Board({ repl: false }).on("ready", function() {
   console.log('Johnny-Five up, Board Ready!')
@@ -117,20 +118,24 @@ app.post('/temperatures', (req, res, next) => {
 
   lastReading = reading
 
-  //console.log(lastReading)
+  console.log(lastReading)
   //io.sockets.emit('reading', reading)
+
+  res.sendStatus(200)
+  next()
+})
+
+setInterval(() => {
+  if (!lastReading) { return }
+  
   saveMeasurement(lastReading)
     .then(results => {
       lastSaveTime = new Date().getTime()
-      res.sendStatus(200)
       console.log('Reading saved.')
-      next()
     })
     .catch(error => {
       console.log(error)
-      res.sendStatus(500)
-      next()
     })
-})
+}, (1000))
 
 server.listen(PORT, () => console.log(`API listening on ${serverIP}`))
