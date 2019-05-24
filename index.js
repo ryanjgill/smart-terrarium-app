@@ -127,7 +127,7 @@ app.post('/temperatures', (req, res, next) => {
 
 setInterval(() => {
   if (!lastReading) { return }
-  
+
   saveMeasurement(lastReading)
     .then(results => {
       lastSaveTime = new Date().getTime()
@@ -136,6 +136,6 @@ setInterval(() => {
     .catch(error => {
       console.log(error)
     })
-}, (1000))
+}, (1000 * 60))
 
 server.listen(PORT, () => console.log(`API listening on ${serverIP}`))

@@ -1,6 +1,6 @@
 const config = require('./../config.json')
 const database = 'SmartTerrarium'
-const tableName = 'measurements'
+const defaultTable = 'measurements'
 const r = require('rethinkdbdash')({
   db: database,
   servers: [{
@@ -9,6 +9,7 @@ const r = require('rethinkdbdash')({
   }]
 })
 
-module.exports = function saveMeasurement(measurement) {
+module.exports = function saveMeasurement(measurement, _tableName) {
+  let tableName = _tableName ? _tableName : defaultTable
   return r.table(tableName).insert(measurement)
 }
