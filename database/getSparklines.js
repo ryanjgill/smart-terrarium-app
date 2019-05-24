@@ -33,8 +33,7 @@ module.exports = function getSparklines() {
   }
 
   return r.table(tableName)
-    .between(r.time(yesterday.year, yesterday.month, yesterday.day, yesterday.hours, 0, 0,"Z"), r.time(today.year, today.month, today.day, 23, 59, 59, "Z"), {index: 'date'})
-    .sample(200)
+    .between(r.time(yesterday.year, yesterday.month, yesterday.day, yesterday.hours, 0, 0,"Z"), r.time(today.year, today.month, today.day, today.hours, today.minutes, today.seconds, "Z"), {index: 'date'})
     .orderBy(r.asc('date'))
     
 }

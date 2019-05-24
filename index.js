@@ -72,6 +72,10 @@ app.get('/measurements', (req, res, next) => {
       if (index % 10 === 0) { measurements.push(m) }
       return measurements
     }, [])
+
+    if (lastReading) {
+      results.push(lastReading);
+    }
     res.json(temp)
     next()
   })
@@ -84,11 +88,11 @@ app.get('/measurements', (req, res, next) => {
 app.get('/sparklines', (req, res, next) => {
   getSparklines()
   .then(results => {
-    let temp = results.reduce((measurements, m, index) => {
-      if (index % 10 === 0) { measurements.push(m) }
-      return measurements
-    }, [])
-    res.json(temp)
+    if (lastReading) {
+      results.push(lastReading);
+    }
+    
+    res.json(results)
     next()
   })
   .catch(err => {
