@@ -17,7 +17,9 @@ const emptyDrainLevel = 23
 var misterWaterLevel = 0,
   drainWaterLevel = 0,
   lastReading,
-  lastSaveTime
+  lastSaveTime,
+  misterRelayValue,
+  lightsRelayValue
     
 new five.Board({ repl: false }).on("ready", function() {
   console.log('Johnny-Five up, Board Ready!')
@@ -29,6 +31,12 @@ new five.Board({ repl: false }).on("ready", function() {
   const lightsRelay = new five.Relay(2)
   const misterRelay = new five.Relay(3)
 
+  // start off with the lights and mister off
+  lightsRelay.off()
+  misterRelay.off()
+  lightsRelayValue = false
+  misterRelayValue = false
+
   misterWaterLevelSensor.on('change', function() {
     let level = Math.round((emptyMisterLevel - this.cm + 1) / emptyMisterLevel * 100)
     misterWaterLevel = level > 0 ? level : 0
@@ -39,15 +47,35 @@ new five.Board({ repl: false }).on("ready", function() {
     drainWaterLevel = level > 0 ? level : 0
   })
 
-  // io.on('connection', function(socket){
-  //   socket.on('toggleMister', function(value){ 
-  //     misterRelay = value
-  //   })
+  io.on('connection', function(socket){
+    socket.on('toggleMister', function(value){
+      if (value) {
+        misterRelay.on()
+      } else {
+        misterRelay.off()
+      }
+      misterRelayValue = value
+      console.log('misterRelay: ', value);
+      socket.emit('misterValue', value);
+    })
 
-  //   socket.on('toggleLights', function(value){ 
-  //     lightsRelay = value
-  //   })
-  // })
+    socket.on('toggleLights', function(value){ 
+      if (value) {
+        lightsRelay.on()
+      } else {
+        lightsRelay.off()
+      }
+
+      lightsRelayValue = value
+
+      console.log('lightsRelay: ', value);
+      socket.emit('lightsValue', value);
+    })
+
+    // emit current values
+    socket.emit('misterValue', misterRelayValue);
+    socket.emit('lightsValue', lightsRelayValue);
+  })
 })
 
 app.use(cors())
@@ -122,7 +150,7 @@ app.post('/temperatures', (req, res, next) => {
 
   lastReading = reading
 
-  console.log(lastReading)
+  //console.log(lastReading)
   //io.sockets.emit('reading', reading)
 
   res.sendStatus(200)
