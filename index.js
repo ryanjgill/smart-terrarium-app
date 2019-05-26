@@ -32,8 +32,9 @@ new five.Board({ repl: false }).on("ready", function() {
   const misterRelay = new five.Relay(3)
 
   // start off with the lights and mister off
-  lightsRelay.off()
-  misterRelay.off()
+  // relay is active low
+  lightsRelay.on()
+  misterRelay.on()
   lightsRelayValue = false
   misterRelayValue = false
 
@@ -49,26 +50,24 @@ new five.Board({ repl: false }).on("ready", function() {
 
   io.on('connection', function(socket){
     socket.on('toggleMister', function(value){
-      if (value) {
+      // relay is active low
+      if (!value) {
         misterRelay.on()
       } else {
         misterRelay.off()
       }
       misterRelayValue = value
-      console.log('misterRelay: ', value);
       socket.emit('misterValue', value);
     })
 
     socket.on('toggleLights', function(value){ 
-      if (value) {
+      // relay is active low
+      if (!value) {
         lightsRelay.on()
       } else {
         lightsRelay.off()
       }
-
       lightsRelayValue = value
-
-      console.log('lightsRelay: ', value);
       socket.emit('lightsValue', value);
     })
 
