@@ -10,7 +10,7 @@ const r = require('rethinkdbdash')({
 })
 
 module.exports = function getAllMeasurements() {
-  return r.table(tableName).orderBy({index: 'date'})
+  return r.table(tableName).orderBy({index: r.asc('date')})
 }
 
 /* Other Queries */
