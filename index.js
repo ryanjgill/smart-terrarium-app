@@ -20,7 +20,7 @@ var misterWaterLevel = 0,
   lastSaveTime,
   misterRelayValue,
   lightsRelayValue
-    
+
 new five.Board({ repl: false }).on("ready", function() {
   console.log('Johnny-Five up, Board Ready!')
 
@@ -60,7 +60,7 @@ new five.Board({ repl: false }).on("ready", function() {
       socket.emit('misterValue', value);
     })
 
-    socket.on('toggleLights', function(value){ 
+    socket.on('toggleLights', function(value){
       // relay is active low
       if (!value) {
         lightsRelay.on()
@@ -92,6 +92,12 @@ app.get('/', (req, res, next) => {
   next()
 })
 
+// get last measurement
+app.get('/measurement', (req, res, next) => {
+  res.json(lastReading || {})
+  next()
+})
+
 app.get('/measurements', (req, res, next) => {
   getSampleMeasurements()
   .then(results => {
@@ -118,7 +124,7 @@ app.get('/sparklines', (req, res, next) => {
     if (lastReading) {
       results.push(lastReading);
     }
-    
+
     res.json(results)
     next()
   })
