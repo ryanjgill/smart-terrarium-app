@@ -172,7 +172,7 @@ new five.Board({ repl: false }).on("ready", function() {
       misterRelay.off()
       misterRelayValue = true
     }
-    socket.emit('misterValue', misterRelayValue);
+    io.sockets.emit('misterValue', misterRelayValue);
     res.sendStatus(200)
     next()
   })
@@ -188,7 +188,7 @@ new five.Board({ repl: false }).on("ready", function() {
       lightsRelay.off()
       lightsRelayValue = true
     }
-    socket.emit('lightsValue', lightsRelayValue);
+    io.sockets.emit('lightsValue', lightsRelayValue);
     res.sendStatus(200)
     next()
   })
