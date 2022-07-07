@@ -15,7 +15,7 @@
     "express": "^4.16.4",
     "ip": "^1.1.5",
     "johnny-five": "^1.0.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "rethinkdbdash": "^2.3.31",
     "socket.io": "^2.2.0"
   }
