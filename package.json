@@ -17,6 +17,6 @@
     "johnny-five": "^1.0.0",
     "moment": "^2.24.0",
     "rethinkdbdash": "^2.3.31",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.5.0"
   }
 }
